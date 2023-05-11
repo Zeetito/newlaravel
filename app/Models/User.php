@@ -3,10 +3,11 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
@@ -22,6 +23,12 @@ class User extends Authenticatable
         'email',
         'password',
     ];
+    //Nb.. if the file is deleted, it would show somthing else and not the fall-back avatar
+    protected function avatar(): Attribute{
+        return Attribute::make(get: function($value) {
+            return $value ? "/storage/avatars/".$value : "/fallback-avatar.jpg";
+        });
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -45,4 +52,8 @@ class User extends Authenticatable
     public function posts(){
        return $this->hasMany(Post::class,'user_id');
     }
+
+    // public function avatar(){
+    //         return "/storage/avatars/$this->avatar";
+    //     }
 }
